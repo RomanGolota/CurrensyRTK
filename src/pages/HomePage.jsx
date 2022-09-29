@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {useGetCurrencyQuery} from "../store/currency/currency.api";
 import {addToFav, deleteFav} from "../store/currency/favSlice";
+import styles from './HomePage.module.css'
 
 const HomePage = () => {
     const {isLoading, data = []} = useGetCurrencyQuery()
@@ -25,22 +26,22 @@ const HomePage = () => {
         <div>
             {isLoading && <h2 className="text-center">Loading...</h2>}
             <select onChange={setCurrency}>
+                <option>Choose currency</option>
                 {data.map(item => <option
                     key={item.r030}
                 >
                     {item.txt}</option>)}
             </select>
-            <span className="ml-2">{currentCurrency.rate}</span>
+            <span className="ml-2">{currentCurrency?.rate}</span>
 
-            {!favorites.includes(currentCurrency) && <button className='py-2 px-4 bg-yellow-400 ml-2 rounded hover:shadow-md transition-all'
+            {!favorites.includes(currentCurrency) && currentCurrency && <button className={styles.addButton}
                 onClick={AddToFav}
             >Add</button>}
 
-            {favorites.includes(currentCurrency) && <button className='py-2 px-4 bg-red-400 rounded hover:shadow-md transition-all'
+            {favorites.includes(currentCurrency) && <button className={styles.removeButton}
                 onClick={deleteFromFav}
             >Remove</button>
             }
-
         </div>
     );
 };
