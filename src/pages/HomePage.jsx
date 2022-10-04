@@ -4,7 +4,7 @@ import {Navigate, Route} from "react-router-dom";
 import {useGetCurrencyQuery} from "../store/currency/currency.api";
 import {addToFav, deleteFav} from "../store/currency/favSlice";
 import styles from './HomePage.module.css'
-import {useAuth} from  '../../src/hooks/use-auth'
+import {useAuth} from '../hooks/use-auth'
 import {removeUser} from "../store/currency/userSlice";
 
 const HomePage = () => {
