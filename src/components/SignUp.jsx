@@ -28,8 +28,12 @@ const SignUp = () => {
     return (
         <div>
             <Form
-                title="register"
+                greetingAction="Register your account"
+                link="/login"
+                title="Register"
                 handleClick={handleRegister}
+                actiontype=" Login"
+                titleActionText=" Already have an account?"
             />
 
         </div>

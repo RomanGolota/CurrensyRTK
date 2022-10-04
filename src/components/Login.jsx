@@ -27,8 +27,12 @@ const Login = () => {
     return (
         <div>
             <Form
-                title="sign in"
+                greetingAction="Sign in to your account"
+                link="/register"
+                title="Sign in"
                 handleClick={handleLogin}
+                actiontype=" Register"
+                titleActionText=" Don't have an account?"
             />
         </div>
     );
