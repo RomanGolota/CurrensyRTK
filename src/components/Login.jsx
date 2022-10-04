@@ -19,7 +19,7 @@ const Login = () => {
                     id: user.uid,
                     token: user.accessToken
                 }))
-                navigate('/')
+                navigate('/homepage')
             })
             .catch(() => alert('Invalid User!'))
     }
