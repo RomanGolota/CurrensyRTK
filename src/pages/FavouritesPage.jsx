@@ -1,17 +1,18 @@
-import React from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {deleteFav} from "../store/currency/favSlice";
+import React from 'react'
+import {useDispatch, useSelector} from "react-redux"
+import {deleteFav} from "../store/currency/favSlice"
+import {useFavourites} from "../hooks/use-favourites"
+import Navigation from "../components/Navigation"
 import styles from './FavouritesPage.module.css'
-import Navigation from "../components/Navigation";
 
 const FavouritesPage = () => {
-    const favorites = useSelector(state => state.fav.fav)
     const dispatch = useDispatch()
+    const favourites = useFavourites()
 
     return (
         <div>
             <Navigation/>
-            {favorites.map(i => <div key={Date.now() + i.txt} className={styles.favElem}>{i.txt} {i.rate} <button
+            {favourites.map(i => <div key={Date.now() + i.currencyName} className={styles.favElem}>{i.currencyName} {i.currencyRate} <button
                      className={styles.deleteButton}
                      onClick={() => dispatch(deleteFav(i.txt))}
                      >Delete</button>
