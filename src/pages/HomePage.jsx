@@ -3,7 +3,6 @@ import {useDispatch} from "react-redux";
 import {Navigate} from "react-router-dom";
 import {useGetCurrencyQuery} from "../store/currency/currency.api";
 import {useAuth} from '../hooks/use-auth'
-import {removeUser} from "../store/currency/userSlice";
 import {useCurrentUser} from "../hooks/use-currentUser";
 import {getDatabase, ref, remove, set} from "firebase/database";
 import {useSetFav} from "../hooks/use-setFav";
@@ -13,7 +12,7 @@ import styles from './HomePage.module.css'
 
 const HomePage = () => {
     const {isLoading, data = []} = useGetCurrencyQuery()
-    const {isAuth,email} = useAuth()
+    const {isAuth} = useAuth()
     const [currentCurrency, setCurrentCurrencyLocal] = useState('')
     const [query, setQuery] = useState('redux');
     const dispatch = useDispatch()
@@ -65,9 +64,6 @@ const HomePage = () => {
                 onClick={deleteFromFav}
             >Remove</button>
             }
-            <button className={styles.LogoutButton}
-                onClick={()=> dispatch(removeUser())}
-            >Log out from {email}</button>
         </div>) : (
             <Navigate to='/login'/>
         )
