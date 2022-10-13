@@ -7,7 +7,6 @@ const Form = ({title, handleClick, link, actiontype, titleActionText, greetingAc
     const [pass, setPass] = useState('')
 
     return (
-
             <div className="body-bg min-h-screen pt-12 md:pt-20 pb-6 px-2 md:px-0">
                 <header className="max-w-lg mx-auto">
                     <a>
@@ -61,7 +60,6 @@ const Form = ({title, handleClick, link, actiontype, titleActionText, greetingAc
                     </p>
                 </div>
             </div>
-
     );
 };
 
