@@ -3,5 +3,6 @@
 }
 
 .favElem {
-    @apply text-center
+    @apply text-center my-1
 }
+

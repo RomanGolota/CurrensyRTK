@@ -1,32 +1,47 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch} from "react-redux";
+import {Navigate} from "react-router-dom";
 import {useGetCurrencyQuery} from "../store/currency/currency.api";
-import {addToFav, deleteFav} from "../store/currency/favSlice";
-import styles from './HomePage.module.css'
 import {useAuth} from '../hooks/use-auth'
 import {removeUser} from "../store/currency/userSlice";
+import {useCurrentUser} from "../hooks/use-currentUser";
+import {getDatabase, ref, remove, set} from "firebase/database";
+import {useSetFav} from "../hooks/use-setFav";
+import {setCurrentCurrency} from "../store/currency/currentCurrency";
 import Navigation from "../components/Navigation";
-import {useFavourites} from "../hooks/use-favourites";
-import {Navigate} from "react-router-dom";
+import styles from './HomePage.module.css'
 
 const HomePage = () => {
     const {isLoading, data = []} = useGetCurrencyQuery()
-    const favorites = useFavourites()
-    const dispatch = useDispatch()
-    const [currentCurrency, setCurrentCurrency] = useState('')
     const {isAuth,email} = useAuth()
+    const [currentCurrency, setCurrentCurrencyLocal] = useState('')
+    const [query, setQuery] = useState('redux');
+    const dispatch = useDispatch()
+    const currentUser = useCurrentUser()
+    const isSetFav = useSetFav(currentCurrency)
+    const db = getDatabase();
+    const path = `users/${currentUser}/favourites/${currentCurrency.cc}`
 
     const setCurrency = (e) => {
-        setCurrentCurrency(data.find(item => item.txt === e.target.value))
+        setCurrentCurrencyLocal(data.find(item => item.txt === e.target.value))
+        dispatch(setCurrentCurrency(currentCurrency))
     }
 
     const AddToFav = () => {
-        dispatch(addToFav(currentCurrency))
+        set(ref(db, path), {
+            currencyName: currentCurrency.txt,
+            currencyRate: currentCurrency.rate,
+            currencyCC: currentCurrency.cc
+        }).then(() => {setQuery(currentCurrency)})
     }
 
     const deleteFromFav = () => {
-        dispatch(deleteFav(currentCurrency.txt))
+        remove(ref(db, path)).then(() => {setQuery(currentCurrency.txt)})
     }
+
+    useEffect(() => {
+
+    }, [query])
 
     return (
         isAuth ? (
@@ -42,15 +57,15 @@ const HomePage = () => {
             </select>
             <span className="ml-2">{currentCurrency?.rate}</span>
 
-            {!favorites.includes(currentCurrency.cc) && currentCurrency && <button className={styles.addButton}
+            {!isSetFav && currentCurrency && <button className={styles.addButton}
                 onClick={AddToFav}
             >Add</button>}
 
-            {favorites.includes(currentCurrency.cc) && <button className={styles.removeButton}
+            {isSetFav && <button className={styles.removeButton}
                 onClick={deleteFromFav}
             >Remove</button>
             }
-            <button
+            <button className={styles.LogoutButton}
                 onClick={()=> dispatch(removeUser())}
             >Log out from {email}</button>
         </div>) : (

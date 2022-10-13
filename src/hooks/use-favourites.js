@@ -1,8 +1,17 @@
-import {useSelector} from "react-redux";
+import { getDatabase, ref, onValue} from "firebase/database";
+import {useCurrentUser} from "./use-currentUser";
 
 export const useFavourites = () => {
-    let favorites = useSelector(state => state.fav.fav).map(item => Object.values(item))
-    favorites = [].concat(...favorites)
+    const db = getDatabase();
+    const currentUser = useCurrentUser()
+    const usersDB = ref(db, `/users/${currentUser}/favourites`)
+    let response = []
 
-    return favorites
+    onValue(usersDB, (snapshot) => {
+        const data = snapshot.val();
+        response = Object.values(data)
+    })
+
+    return response
 }
+
