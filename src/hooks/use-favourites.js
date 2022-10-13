@@ -1,11 +1,11 @@
-import { getDatabase, ref, onValue, get} from "firebase/database";
+import { getDatabase, ref, onValue} from "firebase/database";
 import {useCurrentUser} from "./use-currentUser";
 
 export const useFavourites = () => {
     const db = getDatabase();
     const currentUser = useCurrentUser()
     const usersDB = ref(db, `/users/${currentUser}/favourites`)
-    let response
+    let response = []
 
     onValue(usersDB, (snapshot) => {
         const data = snapshot.val();
