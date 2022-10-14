@@ -7,6 +7,7 @@ import styles from './FavouritesPage.module.css'
 
 const FavouritesPage = () => {
     const [query, setQuery] = useState('redux');
+    const [currentCurr, setCurr] = useState({currencyCC: '-', currencyRate: '-', currencyDate: '-'});
     const favourites = useFavourites()
     const currentUser = useCurrentUser()
     const db = getDatabase()
@@ -23,10 +24,10 @@ const FavouritesPage = () => {
     return (
         <div>
             <Navigation/>
-            {favourites.map(i => <div key={Date.now() + i.currencyName} className={styles.favElem}>
-                <span>{i.currencyCC}</span>
+            {favourites.map(i => <div key={Date.now() + i.currencyName} className={styles.favElem} onClick={() => setCurr(i)}>
                 <span className="mx-1">{i.currencyName}</span>
-                <span className="mx-1">{i.currencyRate}</span>
+                <span>{i.currencyCC}</span>
+
                 <button
                      className={styles.deleteButton}
                      onClick={removeFromFav}
@@ -35,6 +36,45 @@ const FavouritesPage = () => {
                 </button>
                 </div>)
             }
+            <div
+                className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-6 sm:py-12">
+
+                <div
+                    className="relative bg-white px-6 pt-10 pb-8 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:max-w-lg sm:rounded-lg sm:px-10">
+                    <div className="mx-auto max-w-md">
+                        <div className="divide-y divide-gray-300/50">
+                            <div className="space-y-6 py-8 text-base leading-7 text-gray-600">
+                                <ul className="space-y-4">
+                                    <li className="flex items-center">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/893/893336.png" alt=""
+                                             className="h-6"/>
+                                        <p className="ml-4">Currency index: <strong>{currentCurr.currencyCC}</strong></p>
+                                    </li>
+                                    <li className="flex items-center">
+
+                                        <img src="https://cdn-icons-png.flaticon.com/512/1/1437.png" alt=""
+                                             className="h-6"/>
+                                        <p className="ml-4">
+                                            Currency exchange rate against UAH: <strong>{currentCurr.currencyRate}</strong>
+                                        </p>
+                                    </li>
+                                    <li className="flex items-center">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/2672/2672219.png" alt=""
+                                             className="h-6"/>
+                                        <p className="ml-4">Currency exchange
+                                            date: <strong>{currentCurr.currencyDate}</strong></p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="pt-8 text-base font-semibold leading-7">
+                                <p>Statistic</p>
+                                <p>Yesterday</p>
+                                <p>7 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
