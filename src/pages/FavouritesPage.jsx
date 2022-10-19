@@ -4,16 +4,20 @@ import {getDatabase, ref, remove} from "firebase/database";
 import {useCurrentUser} from "../hooks/use-currentUser";
 import Navigation from "../components/Navigation"
 import styles from './FavouritesPage.module.css'
+import {useSelector} from "react-redux";
 
 const FavouritesPage = () => {
+    const rateCurrency = useSelector(state => state.rateCurrency.rateCurrency)
     const [query, setQuery] = useState('redux');
     const [currentCurr, setCurr] = useState({currencyCC: '-', currencyRate: '-', currencyDate: '-'});
     const favourites = useFavourites()
     const currentUser = useCurrentUser()
+    const favouritesToMap = rateCurrency.filter(item => favourites.includes(item.cc))
     const db = getDatabase()
 
     const removeFromFav = (e) => {
         const deletedCurrency = (e.target.parentElement.innerText).split('').splice(0, 3).join('')
+        console.log(deletedCurrency)
         remove(ref(db, `users/${currentUser}/favourites/${deletedCurrency}`)).then(() => {setQuery(deletedCurrency)})
     }
 
@@ -24,9 +28,9 @@ const FavouritesPage = () => {
     return (
         <div>
             <Navigation/>
-            {favourites.map(i => <div key={Date.now() + i.currencyName} className={styles.favElem} onClick={() => setCurr(i)}>
-                <span className="mx-1">{i.currencyName}</span>
-                <span>{i.currencyCC}</span>
+            {favouritesToMap.map(i => <div key={Date.now() + i.cc} className={styles.favElem} onClick={() => setCurr(i)}>
+                <span className="mx-1">{i.cc}</span>
+                <span>{i.currencyName}</span>
 
                 <button
                      className={styles.deleteButton}
@@ -48,21 +52,21 @@ const FavouritesPage = () => {
                                     <li className="flex items-center">
                                         <img src="https://cdn-icons-png.flaticon.com/512/893/893336.png" alt=""
                                              className="h-6"/>
-                                        <p className="ml-4">Currency index: <strong>{currentCurr.currencyCC}</strong></p>
+                                        <p className="ml-4">Currency index: <strong>{currentCurr.cc}</strong></p>
                                     </li>
                                     <li className="flex items-center">
 
                                         <img src="https://cdn-icons-png.flaticon.com/512/1/1437.png" alt=""
                                              className="h-6"/>
                                         <p className="ml-4">
-                                            Currency exchange rate against UAH: <strong>{currentCurr.currencyRate}</strong>
+                                            Currency exchange rate against UAH: <strong>{currentCurr.rate}</strong>
                                         </p>
                                     </li>
                                     <li className="flex items-center">
                                         <img src="https://cdn-icons-png.flaticon.com/512/2672/2672219.png" alt=""
                                              className="h-6"/>
                                         <p className="ml-4">Currency exchange
-                                            date: <strong>{currentCurr.currencyDate}</strong></p>
+                                            date: <strong>{currentCurr.exchangedate}</strong></p>
                                     </li>
                                 </ul>
                             </div>
