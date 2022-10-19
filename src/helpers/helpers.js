@@ -3,3 +3,4 @@ export const getUserName = (email) => {
     const userName = email.slice(0, findedIndex)
     return userName
 }
+
