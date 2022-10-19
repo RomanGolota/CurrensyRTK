@@ -13,8 +13,16 @@ export const currencyApi = createApi({
                     q: 'json'
                 }
             })
+        }),
+        getCurrencyYesterday: build.query({
+            query: ( body) => ({
+                url: `NBUStatService/v1/statdirectory/exchange?valcode=${body.curr}&date=${body.date}`,
+                params: {
+                    q: 'json'
+                }
+            })
         })
     })
 })
 
-export const {useGetCurrencyQuery} = currencyApi
+export const {useGetCurrencyQuery, useLazyGetCurrencyYesterdayQuery} = currencyApi

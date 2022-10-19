@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch} from "react-redux";
 import {Navigate} from "react-router-dom";
-import {useGetCurrencyQuery} from "../store/currency/currency.api";
+import {useGetCurrencyQuery, useLazyGetCurrencyYesterdayQuery} from "../store/currency/currency.api";
 import {useAuth} from '../hooks/use-auth'
 import {useCurrentUser} from "../hooks/use-currentUser";
 import {getDatabase, ref, remove, set} from "firebase/database";
 import {useSetFav} from "../hooks/use-setFav";
+import {useDateTransform} from "../hooks/use-dateTransform";
 import {setCurrentCurrency} from "../store/currency/currentCurrency";
+import {setRateCurrency} from "../store/currency/rateCurrency";
 import Navigation from "../components/Navigation";
 import styles from './HomePage.module.css'
 
@@ -14,26 +16,49 @@ const HomePage = () => {
     const {isLoading, data = []} = useGetCurrencyQuery()
     const {isAuth} = useAuth()
     const [currentCurrency, setCurrentCurrencyLocal] = useState('')
+    const [yesterdayCurrency, setYesterdayCurrency] = useState(currentCurrency)
+    const [weekAgoCurrency, setWeekAgoCurrency] = useState(currentCurrency)
     const [query, setQuery] = useState('redux');
     const dispatch = useDispatch()
     const currentUser = useCurrentUser()
     const isSetFav = useSetFav(currentCurrency)
     const db = getDatabase();
     const path = `users/${currentUser}/favourites/${currentCurrency.cc}`
+    const [fetchCurr, { isLoading: areYesterdayLoading, data: yestarday}] = useLazyGetCurrencyYesterdayQuery()
+    const dayMs = 86400000
+    const weekMs = 86400000 * 7
+    const yesterday = useDateTransform(dayMs)
+    const weekAgo = useDateTransform(weekMs)
 
-    const setCurrency = (e) => {
+    useEffect(() => {
+        dispatch(setRateCurrency(data))
+    }, [isLoading])
+
+    const setCurrency = async (e) => {
         setCurrentCurrencyLocal(data.find(item => item.txt === e.target.value))
-        console.log(currentCurrency)
+
+        const curr = data.find(item => item.txt === e.target.value)
+        const bodyYesterday = {
+            curr: curr.cc,
+            date: yesterday
+        }
+        const bodyWeekAgo = {
+            curr: curr.cc,
+            date: weekAgo
+        }
+        const respYesterday = await fetchCurr(bodyYesterday)
+        const respWeekAgo = await fetchCurr(bodyWeekAgo)
+
+        setYesterdayCurrency(respYesterday.data[0].rate)
+        setWeekAgoCurrency(respWeekAgo.data[0].rate)
+
         dispatch(setCurrentCurrency(currentCurrency))
     }
 
     const AddToFav = () => {
-        set(ref(db, path), {
-            currencyName: currentCurrency.txt,
-            currencyRate: currentCurrency.rate,
-            currencyCC: currentCurrency.cc,
-            currencyDate: currentCurrency.exchangedate
-        }).then(() => {setQuery(currentCurrency)})
+        set(ref(db, path),
+            currentCurrency.cc
+        ).then(() => {setQuery(currentCurrency)})
     }
 
     const deleteFromFav = () => {
@@ -53,6 +78,7 @@ const HomePage = () => {
                 <option disabled={true} selected={true}>Choose currency</option>
                 {data.map(item => <option
                     key={item.r030}
+                    // value={item}
                 >
                     {item.txt}</option>)}
             </select>
@@ -75,7 +101,7 @@ const HomePage = () => {
                             <div className="space-y-6 py-8 text-base leading-7 text-gray-600">
                                 <ul className="space-y-4">
                                     <li className="flex items-center">
-                                        <img src="https://cdn-icons-png.flaticon.com/512/893/893336.png" alt="" class="h-6"/>
+                                        <img src="https://cdn-icons-png.flaticon.com/512/893/893336.png" alt="" className="h-6"/>
                                         <p className="ml-4">Currency index: <strong>{currentCurrency.cc}</strong></p>
                                     </li>
                                     <li className="flex items-center">
@@ -92,9 +118,28 @@ const HomePage = () => {
                                 </ul>
                             </div>
                             <div className="pt-8 text-base font-semibold leading-7">
-                                <p>Statistic</p>
-                                <p>Yesterday</p>
-                                <p>7 days ago</p>
+
+                                <ul className="space-y-4">
+                                    <li className="flex items-center">
+                                        <p className="ml-4">Yesterday {yesterdayCurrency} <span className="ml-40">{(currentCurrency.rate - yesterdayCurrency).toFixed(5)}</span></p>
+                                        {(currentCurrency.rate - yesterdayCurrency) === 0 ?
+                                            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828779.png" alt="" className="h-6  ml-2"/> :
+                                            (currentCurrency.rate - yesterdayCurrency) > 0 ?
+                                            <img src="https://cdn-icons-png.flaticon.com/512/3148/3148312.png" alt="" className="h-6  ml-2"/> :
+                                            <img src="https://cdn-icons-png.flaticon.com/512/3148/3148295.png" alt="" className="h-6"/>
+                                        }
+
+                                    </li>
+                                    <li className="flex items-center">
+                                        <p className="ml-4">Week ago {weekAgoCurrency} <span className="ml-40">{(currentCurrency.rate - weekAgoCurrency).toFixed(5)}</span></p>
+                                        {(currentCurrency.rate - weekAgoCurrency) === 0 ?
+                                            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828779.png" alt="" className="h-6  ml-2"/> :
+                                            (currentCurrency.rate - weekAgoCurrency) > 0 ?
+                                                <img src="https://cdn-icons-png.flaticon.com/512/3148/3148312.png" alt="" className="h-6 ml-2"/> :
+                                                <img src="https://cdn-icons-png.flaticon.com/512/3148/3148295.png" alt="" className="h-6 ml-2"/>
+                                        }
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
