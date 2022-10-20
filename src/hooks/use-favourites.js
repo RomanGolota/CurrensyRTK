@@ -10,7 +10,7 @@ export const useFavourites = () => {
     onValue(usersDB, (snapshot) => {
         const data = snapshot.val();
         response = Object.values(data)
-        // console.log(response)
+
     })
 
     return response
