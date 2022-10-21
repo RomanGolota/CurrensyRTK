@@ -4,7 +4,6 @@ import {useAuth} from "../../hooks/use-auth";
 
 const RedirectPage = () => {
     const {isAuth} = useAuth()
-    console.log(isAuth)
 
     return (
         <div>

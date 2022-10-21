@@ -34,7 +34,6 @@ const SignUp = () => {
                 actiontype=" Login"
                 titleActionText=" Already have an account?"
             />
-
         </div>
     );
 };
